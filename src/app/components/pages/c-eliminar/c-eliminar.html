@@ -1,0 +1,27 @@
+<div class="c-eliminar-container">
+    @if (tipo) {
+        <div class="form-wrapper">
+            <h2>Eliminar {{tipo | titlecase}}</h2>
+            
+            <div class="bh-p-4 bh-mb-4 bh-fondo-gris-3 bh-radio-2">
+                <p class="bh-texto-primario bh-text-lg bh-mb-2">¿Estás seguro de que quieres eliminar este elemento?</p>
+                <p class="bh-texto-acento bh-text-xl bh-mb-1">{{itemNombre}}</p>
+                <p class="bh-texto-error bh-mt-4 bh-text-sm">Esta acción no se puede deshacer.</p>
+            </div>
+
+            <div class="form-actions bh-flex bh-gap-2 bh-justify-end">
+                <button type="button" class="btn-cancel" [routerLink]="['/' + (tipo === 'usuario' ? 'usuarios' : tipo + 's')]">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-submit bh-fondo-error" (click)="eliminar()">
+                    Eliminar Definitivamente
+                </button>
+            </div>
+        </div>
+    } @else {
+        <div class="no-data">
+            <p>No se ha especificado qué eliminar.</p>
+            <button class="btn-cancel" routerLink="/inicio">Volver al inicio</button>
+        </div>
+    }
+</div>

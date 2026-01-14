@@ -1,0 +1,99 @@
+<div class="c-ver-container">
+  @if (data) {
+  <div class="details-wrapper">
+    <h2>Detalles de {{ tipo | titlecase }}</h2>
+
+    <div class="details-content">
+      @if (tipo === 'usuario') {
+      <div class="detail-row">
+        <span class="label">Nombre:</span>
+        <span class="value">{{ data.nombre }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Email:</span>
+        <span class="value">{{ data.email }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Rol:</span>
+        <span class="value">{{ data.rol }}</span>
+      </div>
+      } @else if (tipo === 'peluqueria') {
+      <div class="detail-row">
+        <span class="label">Nombre:</span>
+        <span class="value">{{ data.id }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Nombre:</span>
+        <span class="value">{{ data.nombre }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Email:</span>
+        <span class="value">{{ data.email }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Teléfono:</span>
+        <span class="value">{{ data.telefono }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Dirección:</span>
+        <span class="value">{{ data.direccion }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Ciudad/Municipio:</span>
+        <span class="value">{{ data.ciudad || data.municipio }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Lista de productos:</span>
+        @for (p of data.productos; track $index) {
+        <span class="value">{{ p.nombre }} | {{ p.precio }} € | {{ p.duracion }} min</span> }
+      </div>
+      } @else if (tipo === 'categoria') {
+      <div class="detail-row">
+        <span class="label">id:</span>
+        <span class="value">{{ data.id }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Nombre:</span>
+        <span class="value">{{ data.nombre }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Descripcion:</span>
+        <span class="value">{{ data.descripcion }}</span>
+      </div>
+      }@else if (tipo === 'producto') {
+      <div class="detail-row">
+        <span class="label">Peluqueria:</span>
+        <span class="value">{{ data.peluqueria.nombre }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Categoria:</span>
+        <span class="value">{{ data.categoria.nombre }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Nombre:</span>
+        <span class="value">{{ data.nombre }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Precio:</span>
+        <span class="value">{{ data.precio }} €</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Duracion:</span>
+        <span class="value">{{ data.duracion }} min</span>
+      </div>
+      }
+    </div>
+
+    <div class="actions">
+      <a [routerLink]="['/' + (tipo === 'usuario' ? 'usuarios' : tipo + 's')]" class="btn-back">
+        Volver
+      </a>
+    </div>
+  </div>
+  } @else {
+  <div class="no-data">
+    <p>Cargando información o no encontrada...</p>
+    <a routerLink="/inicio" class="btn-back">Volver al inicio</a>
+  </div>
+  }
+</div>
