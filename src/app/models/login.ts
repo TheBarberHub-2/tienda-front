@@ -1,4 +1,4 @@
 export interface LogIn {
-  email: string;
-  contrasenya: string;
+  login: string;
+  password: string;
 }

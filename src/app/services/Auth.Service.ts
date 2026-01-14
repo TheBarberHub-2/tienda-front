@@ -7,11 +7,12 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8080/api/auth/login'; 
-  constructor(private http: HttpClient, private router: Router) {}
+  private apiUrl = '/auth/login';
+
+  constructor(private http: HttpClient, private router: Router) { }
 
   login(credentials: any) {
-    return this.http.post<any>(this.apiUrl, credentials);
+    return this.http.post<any>(this.apiUrl, credentials); //Aqui devolveria el token que me da el backend a traves de la api y el metodo
   }
 
   setToken(token: string) {
@@ -22,8 +23,28 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
+  getLogin(): string | null {
+    return localStorage.getItem('login');
+  }
+
+  getApiToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
   logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+    this.http.delete('/auth/logout').subscribe({
+      next: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('login');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Logout error:', err);
+        // Still clear local data and redirect even if server call fails
+        localStorage.removeItem('token');
+        localStorage.removeItem('login');
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }

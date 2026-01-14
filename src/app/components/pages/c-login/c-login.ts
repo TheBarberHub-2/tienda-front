@@ -18,16 +18,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './c-login.html',
   styleUrl: './c-login.scss',
 })
-export class CLogin implements OnInit {
+export class CLogin {
   loginForm!: FormGroup;
-  login: LogIn = { email: '', contrasenya: '' };
+  login: LogIn = { login: '', password: '' };
   error: string = '';
 
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.initForms();
@@ -35,8 +35,8 @@ export class CLogin implements OnInit {
 
   initForms() {
     this.loginForm = this.fb.group({
-      usuario: ['', Validators.required],
-      contraseña: ['', Validators.required],
+      login: ['', Validators.required],
+      password: ['', Validators.required],
     });
   }
 
@@ -46,8 +46,8 @@ export class CLogin implements OnInit {
         this.error = '';
         this.router.navigate(['/inicio']);
       },
-      error: (err) => {
-        this.error = err.error?.message;
+      error: (error) => {
+        this.error = error.error?.message;
       },
     });
   }

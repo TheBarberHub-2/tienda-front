@@ -1,44 +1,74 @@
 import { Component, OnInit } from '@angular/core';
 import { CPanel } from '../../ui/c-panel/c-panel';
-import { PeluqueriasService } from '../../../services/peluquerias.service';
-import { CategoriasService } from '../../../services/categorias.service';
-import { UsuariosService } from '../../../services/usuarios.service';
-import { ProductosService } from '../../../services/productos.service';
+import { CuentasService } from '../../../services/Cuentas.Service';
+import { TarjetaService } from '../../../services/Tarjeta.Service';
+import { cuentaBancaria } from '../../../models/cuenta-bancaria/cuentaBancaria';
+import { tarjetaCredito } from '../../../models/tarjeta-credito/tarjeta-credito';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/Auth.Service';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CPanel],
+  imports: [CPanel, CommonModule],
   templateUrl: './inicio.html',
   styleUrl: './inicio.scss',
 })
 export class Inicio implements OnInit {
-  peluqueriasCount: number = 0;
-  categoriasCount: number = 0;
-  usuariosCount: number = 0;
-  productosCount: number = 0;
+  cuentas: cuentaBancaria[] = [];
+  tarjetas: tarjetaCredito[] = [];
 
   constructor(
-    private peluqueriasService: PeluqueriasService,
-    private categoriasService: CategoriasService,
-    private usuariosService: UsuariosService,
-    private productosService: ProductosService
-  ) {}
+    private cuentasService: CuentasService,
+    private tarjetaService: TarjetaService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit() {
-    this.peluqueriasService.getPeluquerias().subscribe((data) => {
-      this.peluqueriasCount = data.totalElements;
-    });
+    const login = this.authService.getLogin();
+    if (login) {
+      console.log('Fetching profile for login:', login);
+      this.cuentasService.getClienteProfile(login).subscribe({
+        next: (response: any) => {
+          console.log('Profile response:', response);
+          const cliente = Array.isArray(response) ? response[0] : response;
+          if (cliente && cliente.id) {
+            console.log('Found cliente ID:', cliente.id);
+            this.fetchData(cliente.id);
+          } else {
+            console.warn('No cliente ID found in response');
+          }
+        },
+        error: (err) => console.error('Error fetching profile:', err)
+      });
+    }
+  }
 
-    this.categoriasService.getCategorias().subscribe((data) => {
-      this.categoriasCount = data.totalElements;
-    });
+  fetchData(clienteId: number) {
+    console.log('Fetching accounts for clienteId:', clienteId);
+    this.cuentasService.getCuentasByCliente(clienteId).subscribe({
+      next: (cuentas) => {
+        console.log('Accounts response:', cuentas);
+        this.cuentas = Array.isArray(cuentas) ? cuentas : (cuentas as any).data || [];
+        console.log('Processed cuentas:', this.cuentas);
 
-    this.usuariosService.getUsuarios().subscribe((data) => {
-      this.usuariosCount = data.totalElements;
-    });
-    this.productosService.getProductos().subscribe((data) => {
-      this.productosCount = data.totalElements;
+        // Fetch cards for each account to populate the tarjetas list
+        this.tarjetas = [];
+        this.cuentas.forEach(cuenta => {
+          if (cuenta.id) {
+            console.log('Fetching cards for account ID:', cuenta.id);
+            this.tarjetaService.getTarjetasByCuentaId(cuenta.id).subscribe({
+              next: (tarjetas) => {
+                console.log(`Cards for account ${cuenta.id}:`, tarjetas);
+                const processedTarjetas = Array.isArray(tarjetas) ? tarjetas : (tarjetas as any).data || [];
+                this.tarjetas = [...this.tarjetas, ...processedTarjetas];
+              },
+              error: (err) => console.error(`Error fetching cards for account ${cuenta.id}:`, err)
+            });
+          }
+        });
+      },
+      error: (err) => console.error('Error fetching accounts:', err)
     });
   }
 }
